@@ -97,7 +97,7 @@ class SettingsMainController : SettingsController() {
     }
 
     private companion object {
-        private const val URL_HELP = "https://tachiyomi.org/help/"
-        private const val URL_BUG_REPORT = "https://github.com/Jays2Kings/tachiyomiJ2K/issues"
+        private const val URL_HELP = "https://t.me/joinchat/DSbB3hfUwVZOcFeohQIgkA" // "https://tachiyomi.org/help/"
+        private const val URL_BUG_REPORT = "https://t.me/joinchat/DSbB3hfUwVZOcFeohQIgkA" // "https://github.com/Jays2Kings/tachiyomiJ2K/issues"
     }
 }

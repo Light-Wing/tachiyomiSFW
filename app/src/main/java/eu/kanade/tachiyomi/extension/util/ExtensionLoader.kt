@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import dalvik.system.PathClassLoader
-import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.preference.getOrDefault
 import eu.kanade.tachiyomi.extension.model.Extension
 import eu.kanade.tachiyomi.extension.model.LoadResult
 import eu.kanade.tachiyomi.source.CatalogueSource
@@ -16,7 +14,6 @@ import eu.kanade.tachiyomi.util.lang.Hash
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
 /**
@@ -36,9 +33,11 @@ internal object ExtensionLoader {
      * List of the trusted signatures.
      */
     var trustedSignatures = mutableSetOf<String>() +
-            Injekt.get<PreferencesHelper>().trustedSignatures().getOrDefault() +
+//            Injekt.get<PreferencesHelper>().trustedSignatures().getOrDefault() +
             // inorichi's key
-            "7ce04da7773d41b489f4693a366c36bcd0a11fc39b547168553c285bd7348e23"
+//            "7ce04da7773d41b489f4693a366c36bcd0a11fc39b547168553c285bd7348e23"
+    // light's key
+    "430f8004b72a637603931fd2207500637386294046143ab5abccaf4ee60ad8a7"
 
     /**
      * Return a list of all the installed extensions initialized concurrently.
@@ -96,7 +95,7 @@ internal object ExtensionLoader {
         }
 
         val extName = pkgManager.getApplicationLabel(appInfo)?.toString()
-            .orEmpty().substringAfter("Tachiyomi: ")
+            .orEmpty().substringAfter("TachiyomiSFW: ")
         val versionName = pkgInfo.versionName
         val versionCode = pkgInfo.versionCode
 

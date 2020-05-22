@@ -49,7 +49,7 @@ class SettingsDownloadController : SettingsController() {
         switchPreference {
             key = Keys.downloadOnlyOverWifi
             titleRes = R.string.only_download_over_wifi
-            defaultValue = true
+            defaultValue = false
         }
         preferenceCategory {
             titleRes = R.string.remove_after_read
@@ -57,7 +57,7 @@ class SettingsDownloadController : SettingsController() {
             switchPreference {
                 key = Keys.removeAfterMarkedAsRead
                 titleRes = R.string.remove_when_marked_as_read
-                defaultValue = false
+                defaultValue = true
             }
             intListPreference(activity) {
                 key = Keys.removeAfterReadSlots
@@ -66,7 +66,7 @@ class SettingsDownloadController : SettingsController() {
                         R.string.second_to_last, R.string.third_to_last, R.string.fourth_to_last,
                         R.string.fifth_to_last)
                 entryRange = -1..4
-                defaultValue = -1
+                defaultValue = 0
             }
         }
 

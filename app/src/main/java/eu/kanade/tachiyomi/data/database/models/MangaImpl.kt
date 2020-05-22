@@ -42,6 +42,8 @@ open class MangaImpl : Manga {
 
     override var date_added: Long = 0
 
+    override var isSFW: Int? = null // 1 - true, 0 - false
+
     override fun copyFrom(other: SManga) {
         if (other is MangaImpl && (other as MangaImpl)::title.isInitialized &&
             !other.title.isBlank() && other.title != title) {

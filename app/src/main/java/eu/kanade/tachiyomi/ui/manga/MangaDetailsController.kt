@@ -815,6 +815,9 @@ class MangaDetailsController : BaseController,
         val source = presenter.source as? HttpSource ?: return
         val stream = cover?.getUriCompat(context)
         try {
+            // mark - added - filter nsfw from link and don't allow opening or sharing it...
+            if (source.mangaDetailsRequest(presenter.manga).url.toString().contains("nsfw", true)) return
+
             val url = source.mangaDetailsRequest(presenter.manga).url.toString()
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/*"
@@ -835,6 +838,9 @@ class MangaDetailsController : BaseController,
         if (isNotOnline()) return
         val source = presenter.source as? HttpSource ?: return
         val url = try {
+            // mark - added - filter nsfw from link and don't allow opening or sharing it...
+            if (source.mangaDetailsRequest(presenter.manga).url.toString().contains("nsfw", true)) return
+
             source.mangaDetailsRequest(presenter.manga).url.toString()
         } catch (e: Exception) {
             return

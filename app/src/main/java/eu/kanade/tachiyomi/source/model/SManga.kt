@@ -1,6 +1,8 @@
 package eu.kanade.tachiyomi.source.model
 
 import eu.kanade.tachiyomi.data.database.models.MangaImpl
+import eu.kanade.tachiyomi.util.checkAdult
+import timber.log.Timber
 import java.io.Serializable
 
 interface SManga : Serializable {
@@ -23,6 +25,8 @@ interface SManga : Serializable {
 
     var initialized: Boolean
 
+    var isSFW: Int?
+
     fun hasCustomCover() = thumbnail_url?.startsWith("Custom-") == true
 
     fun copyFrom(other: SManga) {
@@ -38,7 +42,16 @@ interface SManga : Serializable {
         if (other.genre != null)
             genre = other.genre
 
-        if (other.thumbnail_url != null && !hasCustomCover())
+        // TODO remove the Timber(s)
+        Timber.i("Genres in SManga copyFrom")
+        Timber.e(genre)
+        Timber.e(other.genre)
+        // mark - added filter to thumbnail
+        if (other.isSFW == 1 || checkAdult(other.genre.toString())) {
+            url = "$url/nsfw" // doing this so I can filter any link with the "nsfw" keyword at the end...
+            isSFW = 1
+            thumbnail_url = "https://fakeimg.pl/225x340/282828/eae0d0/?text=copyFrom%0AReplaced%0Ain-SManga" // ${other.title.replace(" ", "%0A")}"
+        } else if (other.thumbnail_url != null && !hasCustomCover())
             thumbnail_url = other.thumbnail_url
 
         status = other.status

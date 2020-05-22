@@ -333,7 +333,8 @@ open class BrowseSourceController(bundle: Bundle) :
     private fun openInWebView() {
         val source = presenter.source as? HttpSource ?: return
         val activity = activity ?: return
-        val intent = WebViewActivity.newIntent(activity, source.id, source.baseUrl, presenter
+        val url = if (source.baseUrl.contains("nsfw")) "error opening" else source.baseUrl
+        val intent = WebViewActivity.newIntent(activity, source.id, url, presenter
             .source.name)
         startActivity(intent)
     }

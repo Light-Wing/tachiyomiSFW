@@ -6,6 +6,7 @@ import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.online.HttpSource
+import eu.kanade.tachiyomi.util.checkAdult
 import java.util.Date
 import java.util.TreeSet
 
@@ -27,6 +28,11 @@ fun syncChaptersWithSource(
 
     if (rawSourceChapters.isEmpty()) {
         throw Exception("No chapters found")
+    }
+
+    // mark - added
+    if (manga.isSFW == 1 || checkAdult(manga.genre.toString())) {
+        throw Exception("No chapters found (nsfw)")
     }
 
     // Chapters from db.

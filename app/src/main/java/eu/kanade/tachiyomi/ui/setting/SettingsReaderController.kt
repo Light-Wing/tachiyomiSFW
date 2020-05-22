@@ -16,7 +16,7 @@ class SettingsReaderController : SettingsController() {
             entriesRes = arrayOf(R.string.left_to_right_viewer, R.string.right_to_left_viewer,
                     R.string.vertical_viewer, R.string.webtoon, R.string.continuous_vertical)
             entryRange = 1..5
-            defaultValue = 1
+            defaultValue = 3
         }
         intListPreference(activity) {
             key = Keys.imageScaleType
@@ -25,7 +25,7 @@ class SettingsReaderController : SettingsController() {
                     R.string.fit_width, R.string.fit_height,
                     R.string.original_size, R.string.smart_fit)
             entryRange = 1..6
-            defaultValue = 1
+            defaultValue = 3
         }
         intListPreference(activity) {
             key = Keys.zoomStart
@@ -78,7 +78,7 @@ class SettingsReaderController : SettingsController() {
         switchPreference {
             key = Keys.showPageNumber
             titleRes = R.string.show_page_number
-            defaultValue = true
+            defaultValue = false
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             switchPreference {
@@ -104,7 +104,7 @@ class SettingsReaderController : SettingsController() {
             switchPreference {
                 key = Keys.cropBorders
                 titleRes = R.string.crop_borders
-                defaultValue = false
+                defaultValue = true
             }
         }
         preferenceCategory {

@@ -67,7 +67,7 @@ class PreferencesHelper(val context: Context) {
 
     fun doubleTapAnimSpeed() = flowPrefs.getInt(Keys.doubleTapAnimationSpeed, 500)
 
-    fun showPageNumber() = flowPrefs.getBoolean(Keys.showPageNumber, true)
+    fun showPageNumber() = flowPrefs.getBoolean(Keys.showPageNumber, false)
 
     fun trueColor() = flowPrefs.getBoolean(Keys.trueColor, false)
 
@@ -85,21 +85,21 @@ class PreferencesHelper(val context: Context) {
 
     fun colorFilterMode() = flowPrefs.getInt(Keys.colorFilterMode, 0)
 
-    fun defaultViewer() = prefs.getInt(Keys.defaultViewer, 1)
+    fun defaultViewer() = prefs.getInt(Keys.defaultViewer, 3)
 
-    fun imageScaleType() = flowPrefs.getInt(Keys.imageScaleType, 1)
+    fun imageScaleType() = flowPrefs.getInt(Keys.imageScaleType, 3)
 
     fun zoomStart() = flowPrefs.getInt(Keys.zoomStart, 1)
 
     fun readerTheme() = flowPrefs.getInt(Keys.readerTheme, 2)
 
-    fun cropBorders() = flowPrefs.getBoolean(Keys.cropBorders, false)
+    fun cropBorders() = flowPrefs.getBoolean(Keys.cropBorders, true)
 
     fun cropBordersWebtoon() = flowPrefs.getBoolean(Keys.cropBordersWebtoon, false)
 
     fun webtoonSidePadding() = flowPrefs.getInt(Keys.webtoonSidePadding, 0)
 
-    fun webtoonDisableZoom() = flowPrefs.getBoolean(Keys.webtoonDisableZoom, false)
+    fun webtoonDisableZoom() = flowPrefs.getBoolean(Keys.webtoonDisableZoom, true)
 
     fun readWithTapping() = flowPrefs.getBoolean(Keys.readWithTapping, true)
 
@@ -157,15 +157,15 @@ class PreferencesHelper(val context: Context) {
 
     fun downloadsDirectory() = rxPrefs.getString(Keys.downloadsDirectory, defaultDownloadsDir.toString())
 
-    fun downloadOnlyOverWifi() = prefs.getBoolean(Keys.downloadOnlyOverWifi, true)
+    fun downloadOnlyOverWifi() = prefs.getBoolean(Keys.downloadOnlyOverWifi, false)
 
     fun numberOfBackups() = rxPrefs.getInteger(Keys.numberOfBackups, 1)
 
     fun backupInterval() = rxPrefs.getInteger(Keys.backupInterval, 0)
 
-    fun removeAfterReadSlots() = prefs.getInt(Keys.removeAfterReadSlots, -1)
+    fun removeAfterReadSlots() = prefs.getInt(Keys.removeAfterReadSlots, 0)
 
-    fun removeAfterMarkedAsRead() = prefs.getBoolean(Keys.removeAfterMarkedAsRead, false)
+    fun removeAfterMarkedAsRead() = prefs.getBoolean(Keys.removeAfterMarkedAsRead, true)
 
     fun libraryUpdateInterval() = rxPrefs.getInteger(Keys.libraryUpdateInterval, 24)
 
@@ -183,7 +183,7 @@ class PreferencesHelper(val context: Context) {
 
     fun chaptersDescAsDefault() = rxPrefs.getBoolean("chapters_desc_as_default", true)
 
-    fun downloadBadge() = rxPrefs.getBoolean(Keys.downloadBadge, false)
+    fun downloadBadge() = rxPrefs.getBoolean(Keys.downloadBadge, true)
 
     fun filterDownloaded() = rxPrefs.getInteger(Keys.filterDownloaded, 0)
 

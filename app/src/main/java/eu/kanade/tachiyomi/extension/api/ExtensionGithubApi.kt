@@ -67,7 +67,7 @@ internal class ExtensionGithubApi {
         val json = gson.fromJson<JsonArray>(text)
 
         return json.map { element ->
-            val name = element["name"].string.substringAfter("Tachiyomi: ")
+            val name = element["name"].string.substringAfter("TachiyomiSFW: ")
             val pkgName = element["pkg"].string
             val apkName = element["apk"].string
             val versionName = element["version"].string
@@ -85,6 +85,6 @@ internal class ExtensionGithubApi {
 
     companion object {
         private const val REPO_URL =
-            "https://raw.githubusercontent.com/inorichi/tachiyomi-extensions/repo"
+            "https://raw.githubusercontent.com/light-wing/tachiyomi-extensions/repo"
     }
 }

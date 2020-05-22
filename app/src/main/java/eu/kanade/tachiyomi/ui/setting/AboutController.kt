@@ -53,19 +53,19 @@ class AboutController : SettingsController() {
     override fun setupPreferenceScreen(screen: PreferenceScreen) = with(screen) {
         titleRes = R.string.about
 
-        preference {
-            titleRes = R.string.website
-            val url = "https://tachiyomi.org"
-            summary = url
-            onClick {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(intent)
-            }
-        }
+//        preference {
+//            titleRes = R.string.website
+//            val url = "https://tachiyomi.org"
+//            summary = url
+//            onClick {
+//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+//                startActivity(intent)
+//            }
+//        }
 
         preference {
-            title = "Discord"
-            val url = "https://discord.gg/tachiyomi"
+            title = "Telegram" // "Discord"
+            val url = "https://t.me/joinchat/DSbB3hfUwVZOcFeohQIgkA" // "https://discord.gg/tachiyomi"
             summary = url
             onClick {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -74,7 +74,7 @@ class AboutController : SettingsController() {
         }
         preference {
             title = "Github"
-            val url = "https://github.com/Jays2Kings/tachiyomiJ2K"
+            val url = "https://github.com/light-wing/tachiyomiSFW"
             summary = url
             onClick {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -88,9 +88,9 @@ class AboutController : SettingsController() {
                     val intent = Intent(
                         Intent.ACTION_VIEW, Uri.parse(
                             if (BuildConfig.DEBUG) {
-                                "https://github.com/Jays2Kings/tachiyomiJ2K/commits/master"
+                                "https://github.com/light-wing/tachiyomiSFW/commits/master"
                             } else {
-                                "https://github.com/Jays2Kings/tachiyomiJ2K/releases/tag/v${BuildConfig.VERSION_NAME}"
+                                "https://github.com/light-wing/tachiyomiSFW/releases/tag/v${BuildConfig.VERSION_NAME}"
                             }
                         )
                     )

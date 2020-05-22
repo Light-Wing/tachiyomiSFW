@@ -92,6 +92,7 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
 
         val multiSource = extension.sources.size > 1
 
+        // mark - if i want to block all sources from having any preferences
         for (source in extension.sources) {
             if (source is ConfigurableSource) {
                 addPreferencesForSource(screen, source, multiSource)

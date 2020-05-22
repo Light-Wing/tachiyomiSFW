@@ -54,7 +54,7 @@ class SettingsAdvancedController : SettingsController() {
             key = "acra.enable"
             titleRes = R.string.send_crash_report
             summaryRes = R.string.helps_fix_bugs
-            defaultValue = true
+            defaultValue = false
         }
         preference {
             key = CLEAR_CACHE_KEY
