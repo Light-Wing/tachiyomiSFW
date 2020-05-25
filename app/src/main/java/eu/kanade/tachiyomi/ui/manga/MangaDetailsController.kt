@@ -43,7 +43,6 @@ import coil.request.LoadRequest
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
-import com.afollestad.materialdialogs.list.listItems
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.ControllerChangeType
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -307,8 +306,8 @@ class MangaDetailsController : BaseController,
     fun setPaletteColor() {
         val view = view ?: return
 
-        val request = LoadRequest.Builder(view.context).data(manga).allowHardware(false)
-            .target { drawable ->
+        val request = LoadRequest.Builder(view.context).data(presenter.manga).allowHardware(false)
+            .target(onSuccess = { drawable ->
                 val bitmap = (drawable as BitmapDrawable).bitmap
                 // Generate the Palette on a background thread.
                 Palette.from(bitmap).generate {
@@ -317,7 +316,8 @@ class MangaDetailsController : BaseController,
                         android.R.attr.colorBackground
                     )
                     // this makes the color more consistent regardless of theme
-                    val backDropColor = ColorUtils.blendARGB(it.getVibrantColor(colorBack), colorBack, .35f)
+                    val backDropColor =
+                        ColorUtils.blendARGB(it.getVibrantColor(colorBack), colorBack, .35f)
 
                     coverColor = backDropColor
                     getHeader()?.setBackDrop(backDropColor)
@@ -329,7 +329,13 @@ class MangaDetailsController : BaseController,
                 }
                 manga_cover_full.setImageDrawable(drawable)
                 getHeader()?.updateCover(manga!!)
-            }.build()
+            }, onError = {
+                val file = presenter.coverCache.getCoverFile(manga!!)
+                if (file.exists()) {
+                    file.delete()
+                    setPaletteColor()
+                }
+            }).build()
         Coil.imageLoader(view.context).execute(request)
     }
 
@@ -393,8 +399,8 @@ class MangaDetailsController : BaseController,
             presenter.refreshTracking()
             refreshTracker = null
         }
-        // reset the covers and palette cause user might have set a custom cover
-        presenter.forceUpdateCovers(false)
+        // fetch cover again in case the user set a new cover while reading
+        setPaletteColor()
         val isCurrentController = router?.backstack?.lastOrNull()?.controller() ==
             this
         if (isCurrentController) {
@@ -693,10 +699,6 @@ class MangaDetailsController : BaseController,
         inflater.inflate(R.menu.manga_details, menu)
         val editItem = menu.findItem(R.id.action_edit)
         editItem.isVisible = presenter.manga.favorite && !presenter.isLockedFromSearch
-        editItem.title = view?.context?.getString(
-            if (manga?.source == LocalSource.ID)
-                R.string.edit else R.string.edit_cover
-        )
         menu.findItem(R.id.action_download).isVisible = !presenter.isLockedFromSearch &&
             manga?.source != LocalSource.ID
         menu.findItem(R.id.action_mark_all_as_read).isVisible =
@@ -745,29 +747,10 @@ class MangaDetailsController : BaseController,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_edit -> {
-                if (manga?.source == LocalSource.ID) {
-                    editMangaDialog = EditMangaDialog(
-                        this, presenter.manga
-                    )
-                    editMangaDialog?.showDialog(router)
-                } else {
-                    if (manga?.hasCustomCover() == true) {
-                        MaterialDialog(activity!!).listItems(items = listOf(
-                            view!!.context.getString(
-                                R.string.edit_cover
-                            ), view!!.context.getString(
-                                R.string.reset_cover
-                            )
-                        ), waitForPositiveButton = false, selection = { _, index, _ ->
-                            when (index) {
-                                0 -> changeCover()
-                                else -> presenter.clearCustomCover()
-                            }
-                        }).show()
-                    } else {
-                        changeCover()
-                    }
-                }
+                editMangaDialog = EditMangaDialog(
+                    this, presenter.manga
+                )
+                editMangaDialog?.showDialog(router)
             }
             R.id.action_open_in_web_view -> openInWebView()
             R.id.action_refresh_tracking -> presenter.refreshTracking(true)

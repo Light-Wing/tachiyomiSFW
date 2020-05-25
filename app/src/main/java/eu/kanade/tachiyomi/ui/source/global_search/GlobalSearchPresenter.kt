@@ -35,6 +35,7 @@ import uy.kohesive.injekt.injectLazy
 open class GlobalSearchPresenter(
     private val initialQuery: String? = "",
     private val initialExtensionFilter: String? = null,
+    private val sourcesToUse: List<CatalogueSource>? = null,
     val sourceManager: SourceManager = Injekt.get(),
     val db: DatabaseHelper = Injekt.get(),
     private val preferencesHelper: PreferencesHelper = Injekt.get()
@@ -104,14 +105,20 @@ open class GlobalSearchPresenter(
         val hiddenCatalogues = preferencesHelper.hiddenSources().getOrDefault()
         val pinnedCatalogues = preferencesHelper.pinnedCatalogues().getOrDefault()
 
-        return sourceManager.getCatalogueSources()
+        val list = sourceManager.getCatalogueSources()
             .filter { it.lang in languages }
             .filterNot { it.id.toString() in hiddenCatalogues }
             .sortedBy { "(${it.lang}) ${it.name}" }
-            .sortedBy { it.id.toString() !in pinnedCatalogues }
+
+        return if (preferencesHelper.onlySearchPinned().get()) {
+            list.filter { it.id.toString() in pinnedCatalogues }
+        } else {
+            list.sortedBy { it.id.toString() !in pinnedCatalogues }
+        }
     }
 
     private fun getSourcesToQuery(): List<CatalogueSource> {
+        if (sourcesToUse != null) return sourcesToUse
         val filter = extensionFilter
         val enabledSources = getEnabledSources()
         if (filter.isNullOrEmpty()) {

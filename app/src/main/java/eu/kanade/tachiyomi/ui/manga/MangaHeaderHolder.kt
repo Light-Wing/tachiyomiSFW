@@ -137,7 +137,7 @@ class MangaHeaderHolder(
         title.text = manga.title
 
         if (manga.genre.isNullOrBlank().not()) manga_genres_tags.setTags(
-            manga.genre?.split(", ")?.map(String::trim)
+            manga.genre?.split(",")?.map(String::trim)
         )
         else manga_genres_tags.setTags(emptyList())
 
@@ -169,7 +169,7 @@ class MangaHeaderHolder(
         with(favorite_button) {
             icon = ContextCompat.getDrawable(
                 itemView.context, when {
-                    item.isLocked -> R.drawable.ic_lock_white_24dp
+                    item.isLocked -> R.drawable.ic_lock_24dp
                     manga.favorite -> R.drawable.ic_heart_24dp
                     else -> R.drawable.ic_heart_outline_24dp
                 }
@@ -199,7 +199,7 @@ class MangaHeaderHolder(
 
             icon = ContextCompat.getDrawable(
                 itemView.context,
-                if (tracked) R.drawable.ic_check_white_24dp else R.drawable.ic_sync_black_24dp
+                if (tracked) R.drawable.ic_check_24dp else R.drawable.ic_sync_24dp
             )
             checked(tracked)
         }
@@ -291,7 +291,7 @@ class MangaHeaderHolder(
 
             icon = ContextCompat.getDrawable(
                 itemView.context, if (tracked) R.drawable
-                    .ic_check_white_24dp else R.drawable.ic_sync_black_24dp
+                    .ic_check_24dp else R.drawable.ic_sync_24dp
             )
             checked(tracked)
         }
@@ -321,14 +321,6 @@ class MangaHeaderHolder(
             error(drawable)
             if (manga.favorite) networkCachePolicy(CachePolicy.DISABLED)
         })
-    }
-
-    private fun isCached(manga: Manga): Boolean {
-        if (manga.source == LocalSource.ID) return true
-        manga.thumbnail_url?.let {
-            return adapter.delegate.mangaPresenter().coverCache.getCoverFile(manga).exists()
-        }
-        return manga.initialized
     }
 
     fun expand() {

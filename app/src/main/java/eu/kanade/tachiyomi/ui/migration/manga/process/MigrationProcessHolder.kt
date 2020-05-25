@@ -19,7 +19,7 @@ import eu.kanade.tachiyomi.util.view.invisible
 import eu.kanade.tachiyomi.util.view.setVectorCompat
 import eu.kanade.tachiyomi.util.view.visible
 import eu.kanade.tachiyomi.util.view.withFadeTransaction
-import eu.kanade.tachiyomi.widget.CoverViewTarget
+import eu.kanade.tachiyomi.data.image.coil.CoverViewTarget
 import kotlinx.android.synthetic.main.manga_grid_item.view.*
 import kotlinx.android.synthetic.main.migration_process_item.*
 import kotlinx.android.synthetic.main.unread_download_badge.view.*
@@ -52,10 +52,10 @@ class MigrationProcessHolder(
             val source = item.manga.mangaSource()
 
             migration_menu.setVectorCompat(
-                R.drawable.ic_more_vert_black_24dp, view.context.getResourceColor(android.R.attr.textColorPrimary)
+                R.drawable.ic_more_vert_24dp, view.context.getResourceColor(android.R.attr.textColorPrimary)
             )
             skip_manga.setVectorCompat(
-                R.drawable.ic_close_white_24dp, view.context.getResourceColor(
+                R.drawable.ic_close_24dp, view.context.getResourceColor(
                     android.R.attr.textColorPrimary
                 )
             )
@@ -107,7 +107,7 @@ class MigrationProcessHolder(
                     } else {
                         migration_manga_card_to.progress.gone()
                         migration_manga_card_to.title.text =
-                            view.context.applicationContext.getString(R.string.no_alternatives_found)
+                            view.context.getString(R.string.no_alternatives_found)
                     }
                     migration_menu.visible()
                     skip_manga.gone()

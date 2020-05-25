@@ -219,6 +219,8 @@ class PreferencesHelper(val context: Context) {
 
     fun skipRead() = prefs.getBoolean(Keys.skipRead, false)
 
+    fun skipFiltered() = prefs.getBoolean(Keys.skipFiltered, true)
+
     fun useBiometrics() = rxPrefs.getBoolean(Keys.useBiometrics, false)
 
     fun lockAfter() = rxPrefs.getInteger(Keys.lockAfter, 0)
@@ -233,7 +235,8 @@ class PreferencesHelper(val context: Context) {
 
     fun trustedSignatures() = rxPrefs.getStringSet("trusted_signatures", emptySet())
 
-    fun migrationSources() = rxPrefs.getString("migrate_sources", "")
+    // using string instead of set so it is ordered
+    fun migrationSources() = flowPrefs.getString("migrate_sources", "")
 
     fun useSourceWithMost() = rxPrefs.getBoolean("use_source_with_most", false)
 
@@ -272,6 +275,12 @@ class PreferencesHelper(val context: Context) {
     fun hideHopper() = flowPrefs.getBoolean("hide_hopper", false)
 
     fun groupLibraryBy() = flowPrefs.getInt("group_library_by", 0)
+
+    fun showCategoryInTitle() = flowPrefs.getBoolean("category_in_title", false)
+
+    fun onlySearchPinned() = flowPrefs.getBoolean(Keys.onlySearchPinned, false)
+
+    fun showLibraryUpdateErrors() = prefs.getBoolean(Keys.showLibraryUpdateErrors, false)
 
     // Tutorial preferences
     fun shownFilterTutorial() = flowPrefs.getBoolean("shown_filter_tutorial", false)

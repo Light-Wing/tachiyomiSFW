@@ -324,7 +324,7 @@ class BackupRestoreService : Service() {
                     errors.add("${manga.title} - ${e.message}")
                 }
             } else {
-                errors.add("${manga.title} - ${service?.name} not logged in")
+                errors.add("${manga.title} - ${getString(R.string.not_logged_into_, service?.name)}")
                 val notLoggedIn = getString(R.string.not_logged_into_, service?.name)
                 trackingErrors.add(notLoggedIn)
             }
@@ -364,7 +364,7 @@ class BackupRestoreService : Service() {
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(false)
                 .setColor(ContextCompat.getColor(this, R.color.colorAccent))
-                .addAction(R.drawable.ic_clear_grey_24dp_img, getString(android.R.string.cancel), cancelIntent)
+                .addAction(R.drawable.ic_close_24dp, getString(android.R.string.cancel), cancelIntent)
     }
 
     /**
@@ -440,7 +440,7 @@ class BackupRestoreService : Service() {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setColor(ContextCompat.getColor(this, R.color.colorAccent))
         if (errors.size > 0 && !path.isNullOrEmpty() && !file.isNullOrEmpty()) {
-            resultNotification.addAction(R.drawable.ic_clear_grey_24dp_img, getString(R.string
+            resultNotification.addAction(R.drawable.ic_close_24dp, getString(R.string
                 .view_all_errors), getErrorLogIntent(path, file))
         }
         notificationManager.notify(Notifications.ID_RESTORE_COMPLETE, resultNotification.build())
@@ -453,7 +453,7 @@ class BackupRestoreService : Service() {
         val resultNotification = NotificationCompat.Builder(this, Notifications.CHANNEL_BACKUP_RESTORE)
                 .setContentTitle(getString(R.string.restore_error))
                 .setContentText(errorMessage)
-                .setSmallIcon(R.drawable.ic_error_grey)
+                .setSmallIcon(R.drawable.ic_error_24dp)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setColor(ContextCompat.getColor(this, R.color.md_red_500))
         notificationManager.notify(Notifications.ID_RESTORE_ERROR, resultNotification.build())

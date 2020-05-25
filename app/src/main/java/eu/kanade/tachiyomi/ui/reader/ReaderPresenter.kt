@@ -17,7 +17,9 @@ import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.base.presenter.BasePresenter
+import eu.kanade.tachiyomi.ui.reader.chapter.ReaderChapterItem
 import eu.kanade.tachiyomi.ui.reader.loader.ChapterLoader
 import eu.kanade.tachiyomi.ui.reader.loader.DownloadPageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
@@ -25,7 +27,6 @@ import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ViewerChapters
 import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.system.ImageUtil
-import eu.kanade.tachiyomi.util.system.executeOnIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -52,6 +53,8 @@ class ReaderPresenter(
     private val coverCache: CoverCache = Injekt.get(),
     private val preferences: PreferencesHelper = Injekt.get()
 ) : BasePresenter<ReaderActivity>() {
+
+    private val readerChapterFilter = ReaderChapterFilter(downloadManager, preferences)
 
     /**
      * The manga loaded in the reader. It can be null when instantiated for a short time.
@@ -96,16 +99,7 @@ class ReaderPresenter(
             ?: error("Requested chapter of id $chapterId not found in chapter list")
 
         val chaptersForReader =
-            if (preferences.skipRead()) {
-                val list = dbChapters.filter { !it.read }.toMutableList()
-                val find = list.find { it.id == chapterId }
-                if (find == null) {
-                    list.add(selectedChapter)
-                }
-                list
-            } else {
-                dbChapters
-            }
+            readerChapterFilter.filterChapter(dbChapters, manga, selectedChapter)
 
         when (manga.sorting) {
             Manga.SORTING_SOURCE -> ChapterLoadBySource().get(chaptersForReader)
@@ -189,20 +183,42 @@ class ReaderPresenter(
     suspend fun getChapters(): List<ReaderChapterItem> {
         val manga = manga ?: return emptyList()
         chapterItems = withContext(Dispatchers.IO) {
-            val list = db.getChapters(manga).executeOnIO().sortedBy {
-                when (manga.sorting) {
-                    Manga.SORTING_NUMBER -> it.chapter_number
-                    else -> it.source_order.toFloat()
+            val dbChapters = db.getChapters(manga).executeAsBlocking()
+            val list =
+                readerChapterFilter.filterChapter(dbChapters, manga, getCurrentChapter()?.chapter)
+                .sortedBy {
+                    when (manga.sorting) {
+                        Manga.SORTING_NUMBER -> it.chapter_number
+                        else -> it.source_order.toFloat()
+                    }
+                }.map {
+                    ReaderChapterItem(
+                        it, manga, it.id == getCurrentChapter()?.chapter?.id ?: chapterId
+                    )
                 }
-            }.map {
-                ReaderChapterItem(it, manga, it.id ==
-                    getCurrentChapter()?.chapter?.id ?: chapterId)
-            }
-            if (!manga.sortDescending(preferences.chaptersDescAsDefault().getOrDefault()))
+            if (!manga.sortDescending(preferences.chaptersDescAsDefault().getOrDefault())) {
                 list.reversed()
-            else list
+            } else {
+                list
+            }
         }
+
         return chapterItems
+    }
+
+    /**
+     * Removes all filters and requests an UI update.
+     */
+    fun setFilters(read: Boolean, unread: Boolean, downloaded: Boolean, bookmarked: Boolean) {
+        val manga = manga ?: return
+        manga.readFilter = when {
+            read -> Manga.SHOW_READ
+            unread -> Manga.SHOW_UNREAD
+            else -> Manga.SHOW_ALL
+        }
+        manga.downloadedFilter = if (downloaded) Manga.SHOW_DOWNLOADED else Manga.SHOW_ALL
+        manga.bookmarkedFilter = if (bookmarked) Manga.SHOW_BOOKMARKED else Manga.SHOW_ALL
+        db.updateFlags(manga).executeAsBlocking()
     }
 
     /**
@@ -401,6 +417,8 @@ class ReaderPresenter(
         return viewerChaptersRelay.value?.currChapter
     }
 
+    fun getSource() = sourceManager.getOrStub(manga!!.source) as? HttpSource
+
     /**
      * Returns the viewer position used by this manga or the default one.
      */
@@ -518,7 +536,7 @@ class ReaderPresenter(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeFirst(
-                { view, file -> view.onShareImageResult(file) },
+                { view, file -> view.onShareImageResult(file, page) },
                 { _, _ -> /* Empty */ }
             )
     }
@@ -540,12 +558,8 @@ class ReaderPresenter(
                     R.string.cover_updated
                     SetAsCoverResult.Success
                 } else {
-                    manga.thumbnail_url ?: throw Exception("Image url not found")
                     if (manga.favorite) {
-                        coverCache.deleteFromCache(manga)
-                        manga.setCustomThumbnailUrl()
-                        db.insertManga(manga).executeAsBlocking()
-                        coverCache.copyToCache(manga, stream())
+                        coverCache.setCustomCoverToCache(manga, stream())
                         SetAsCoverResult.Success
                     } else {
                         SetAsCoverResult.AddToLibraryFirst

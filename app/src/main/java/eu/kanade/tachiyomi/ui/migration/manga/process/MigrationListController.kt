@@ -38,7 +38,7 @@ import eu.kanade.tachiyomi.util.system.getResourceColor
 import eu.kanade.tachiyomi.util.system.launchUI
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.RecyclerWindowInsetsListener
-import eu.kanade.tachiyomi.util.view.applyWindowInsetsForController
+import eu.kanade.tachiyomi.util.view.liftAppbarWith
 import eu.kanade.tachiyomi.util.view.withFadeTransaction
 import kotlinx.android.synthetic.main.migration_list_controller.*
 import kotlinx.coroutines.CancellationException
@@ -95,7 +95,7 @@ class MigrationListController(bundle: Bundle? = null) : BaseController(bundle),
     override fun onViewCreated(view: View) {
 
         super.onViewCreated(view)
-        view.applyWindowInsetsForController()
+        liftAppbarWith(recycler)
         setTitle()
         val config = this.config ?: return
 
@@ -126,7 +126,7 @@ class MigrationListController(bundle: Bundle? = null) : BaseController(bundle),
     private suspend fun runMigrations(mangas: List<MigratingManga>) {
         val useSourceWithMost = preferences.useSourceWithMost().getOrDefault()
 
-        val sources = preferences.migrationSources().getOrDefault().split("/").mapNotNull {
+        val sources = preferences.migrationSources().get().split("/").mapNotNull {
             val value = it.toLongOrNull() ?: return
             sourceManager.get(value) as? CatalogueSource
         }
@@ -151,8 +151,10 @@ class MigrationListController(bundle: Bundle? = null) : BaseController(bundle),
 
                 val result = try {
                     CoroutineScope(manga.migrationJob).async {
-                        val validSources = sources.filter {
-                            it.id != mangaSource.id
+                        val validSources = if (sources.size == 1) {
+                            sources
+                        } else {
+                            sources.filter { it.id != mangaSource.id }
                         }
                         if (useSourceWithMost) {
                             val sourceSemaphore = Semaphore(3)
@@ -162,15 +164,14 @@ class MigrationListController(bundle: Bundle? = null) : BaseController(bundle),
                                 async {
                                     sourceSemaphore.withPermit {
                                         try {
-                                            /* val searchResult = if (useSmartSearch) {
-                                                 smartSearchEngine.smartSearch(source, mangaObj.title)
-                                             } else {*/
                                             val searchResult = smartSearchEngine.normalSearch(
                                                     source,
                                                     mangaObj.title
                                                 )
 
-                                            if (searchResult != null) {
+                                            if (searchResult != null &&
+                                                !(searchResult.url == mangaObj.url &&
+                                                    source.id == mangaObj.source)) {
                                                 val localManga =
                                                     smartSearchEngine.networkToLocalManga(
                                                         searchResult,
@@ -321,9 +322,18 @@ class MigrationListController(bundle: Bundle? = null) : BaseController(bundle),
         when (item.itemId) {
             R.id.action_search_manually -> {
                 launchUI {
-                    val manga = adapter?.getItem(position) ?: return@launchUI
+                    val manga = adapter?.getItem(position)?.manga?.manga() ?: return@launchUI
                     selectedPosition = position
-                    val searchController = SearchController(manga.manga.manga())
+                    val sources = preferences.migrationSources().get().split("/").mapNotNull {
+                        val value = it.toLongOrNull() ?: return@mapNotNull null
+                        sourceManager.get(value) as? CatalogueSource
+                    }
+                    val validSources = if (sources.size == 1) {
+                        sources
+                    } else {
+                        sources.filter { it.id != manga.source }
+                    }
+                    val searchController = SearchController(manga, validSources)
                     searchController.targetController = this@MigrationListController
                     router.pushController(searchController.withFadeTransaction())
                 }
@@ -453,7 +463,7 @@ class MigrationListController(bundle: Bundle? = null) : BaseController(bundle),
 
         if (adapter?.itemCount == 1) {
             menuMigrate.icon = VectorDrawableCompat.create(
-                resources!!, R.drawable.ic_done_white_24dp, null
+                resources!!, R.drawable.ic_done_24dp, null
             )
         }
 

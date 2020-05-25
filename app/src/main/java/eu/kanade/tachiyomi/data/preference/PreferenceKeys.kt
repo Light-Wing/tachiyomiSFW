@@ -109,6 +109,8 @@ object PreferenceKeys {
 
     const val automaticExtUpdates = "automatic_ext_updates"
 
+    const val onlySearchPinned = "only_search_pinned"
+
     const val downloadNew = "download_new"
 
     const val downloadNewCategories = "download_new_categories"
@@ -119,8 +121,6 @@ object PreferenceKeys {
 
     const val uniformGrid = "uniform_grid"
 
-    const val libraryAsSingleList = "library_as_single_list"
-
     const val lang = "app_language"
 
     const val dateFormat = "app_date_format"
@@ -128,6 +128,8 @@ object PreferenceKeys {
     const val defaultCategory = "default_category"
 
     const val skipRead = "skip_read"
+
+    const val skipFiltered = "skip_filtered"
 
     const val downloadBadge = "display_download_badge"
 
@@ -146,6 +148,8 @@ object PreferenceKeys {
     const val refreshCoversToo = "refresh_covers_too"
 
     const val updateOnRefresh = "update_on_refresh"
+
+    const val showLibraryUpdateErrors = "show_library_update_errors"
 
     const val alwaysShowChapterTransition = "always_show_chapter_transition"
 

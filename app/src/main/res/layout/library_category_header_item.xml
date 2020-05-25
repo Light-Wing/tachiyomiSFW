@@ -25,7 +25,7 @@
         android:contentDescription="@string/select_all"
         android:focusable="true"
         android:padding="5dp"
-        android:src="@drawable/ic_check_circle_white_24dp"
+        android:src="@drawable/ic_check_circle_24dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/category_title"
         app:layout_constraintStart_toStartOf="parent"
@@ -97,7 +97,7 @@
         android:layout_marginEnd="0dp"
         android:background="@drawable/square_ripple"
         android:clickable="true"
-        android:drawableEnd="@drawable/ic_sort_white_24dp"
+        android:drawableEnd="@drawable/ic_sort_24dp"
         android:drawablePadding="6dp"
         android:drawableTint="@color/gray_button"
         android:ellipsize="start"
@@ -118,16 +118,16 @@
         app:layout_constraintTop_toTopOf="@id/category_title"
         tools:text="Drag and Drop" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/update_button"
-        style="@style/Theme.Widget.CustomImageButton"
+        style="@style/Theme.Widget.ImageBorderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="6dp"
         android:clickable="true"
         android:focusable="true"
         android:padding="4dp"
-        android:src="@drawable/ic_refresh_white_24dp"
+        android:src="@drawable/ic_refresh_24dp"
         android:tint="@color/gray_button"
         android:tooltipText="@string/update"
         app:layout_constraintBottom_toBottomOf="@id/category_title"

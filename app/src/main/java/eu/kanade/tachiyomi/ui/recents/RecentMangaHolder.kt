@@ -2,8 +2,8 @@ package eu.kanade.tachiyomi.ui.recents
 
 import android.app.Activity
 import android.view.View
-import coil.api.loadAny
 import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.data.image.coil.loadLibraryManga
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.ui.manga.chapter.BaseChapterHolder
@@ -38,7 +38,7 @@ class RecentMangaHolder(
 
         title.apply {
             text = item.chapter.name
-            setTextColor(ChapterUtil.chapterColor(context, item))
+            ChapterUtil.setTextViewForChapter(this, item)
         }
         subtitle.apply {
             text = item.mch.manga.title
@@ -69,12 +69,17 @@ class RecentMangaHolder(
             )
         }
         if ((itemView.context as? Activity)?.isDestroyed != true) {
-            cover_thumbnail.loadAny(item.mch.manga)
+            cover_thumbnail.loadLibraryManga(item.mch.manga)
         }
         notifyStatus(
             if (adapter.isSelected(adapterPosition)) Download.CHECKED else item.status,
             item.progress
         )
+        resetFrontView()
+    }
+
+    private fun resetFrontView() {
+        if (front_view.translationX != 0f) itemView.post { adapter.notifyItemChanged(adapterPosition) }
     }
 
     override fun onLongClick(view: View?): Boolean {

@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.OnBindViewHolderListenerImpl
-import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.Category
-import eu.kanade.tachiyomi.util.view.marginBottom
+import eu.kanade.tachiyomi.util.system.dpToPx
+import eu.kanade.tachiyomi.util.view.marginTop
 
 class CategoryRecyclerView @JvmOverloads constructor(
     context: Context,
@@ -51,6 +51,16 @@ class CategoryRecyclerView @JvmOverloads constructor(
         }
     }
 
+    fun scrollToCategory(order: Int) {
+        val index = itemAdapter.adapterItems.indexOfFirst { it.category.order == order }
+        if (index > -1) {
+            manager.scrollToPositionWithOffset(
+                index,
+                (height - 38.dpToPx) / 2
+            )
+        }
+    }
+
     fun setCategories(selected: Int) {
         selectedCategory = selected
         for (i in 0..manager.itemCount) {
@@ -60,13 +70,14 @@ class CategoryRecyclerView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
-        val recyclerView = (parent.parent as ViewGroup).findViewById<RecyclerView>(R.id.recycler)
-        val top = recyclerView.paddingTop
-        val bottom = recyclerView.marginBottom
-        val parent = recyclerView.measuredHeight - top - bottom
-        val heightS = if (parent > 0)
+        val mainView = (parent.parent.parent as ViewGroup)
+        val top = marginTop
+        val parent = mainView.measuredHeight - top - 100.dpToPx
+        val heightS = if (parent > 0) {
             MeasureSpec.makeMeasureSpec(parent, MeasureSpec.AT_MOST)
-        else heightSpec
+        } else {
+            heightSpec
+        }
         super.onMeasure(widthSpec, heightS)
     }
 }

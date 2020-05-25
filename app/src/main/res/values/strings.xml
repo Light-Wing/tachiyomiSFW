@@ -91,6 +91,7 @@
     <string name="category_with_name_exists">A category with that name already exists!</string>
     <string name="category_deleted">Category deleted</string>
     <string name="long_press_category">Press and hold to edit a category</string>
+    <string name="jump_to_category">Jump to category</string>
 
     <!-- Updates -->
     <string name="update">Update</string>
@@ -114,6 +115,7 @@
         library from the browse tab.</string>
     <string name="no_matches_for_filters">No matches found for your current filters</string>
     <string name="show_all_categories">Show all categories</string>
+    <string name="always_show_current_category">Always show current category</string>
     <string name="expand_all_categories">Expand all categories</string>
     <string name="collapse_all_categories">Collapse all categories</string>
     <string name="reorder_filters">Reorder filters</string>
@@ -169,6 +171,10 @@
         <item quantity="one">and %1$d more chapter</item>
         <item quantity="other">and %1$d more chapters</item>
     </plurals>
+    <plurals name="notification_update_failed">
+        <item quantity="one">1 update failed</item>
+        <item quantity="other">%1$d updates failed</item>
+    </plurals>
 
     <!-- Library settings -->
     <string name="library_update_frequency">Library update frequency</string>
@@ -180,13 +186,12 @@
     <string name="sort_by_ignoring_articles">Sort by ignoring articles</string>
     <string name="when_sorting_ignore_articles">When sorting alphabetically, sort ignoring
         articles (a, an, the) at the start of manga titles</string>
-    <string name="use_last_saved_migration_preferences">Use last saved pre-migration preferences
-    and sources to mass migrate</string>
     <string name="categories_to_include_in_global_update">Categories to include in global update</string>
     <string name="include_in_global_update">Include in global update</string>
     <string name="auto_refresh_covers">Automatically refresh covers</string>
     <string name="auto_refresh_covers_summary">Refresh covers in library as well
         when updating library</string>
+    <string name="show_notification_error">Show a notification for errors</string>
 
     <!-- Recents -->
     <string name="recents">Recents</string>
@@ -223,7 +228,6 @@
     <string name="local_source">Local source</string>
     <string name="other">Other</string>
     <string name="global_search">Global search…</string>
-    <string name="view_latest">View latest</string>
     <string name="latest">Latest</string>
     <string name="browse">Browse</string>
     <string name="in_library">In Library</string>
@@ -240,7 +244,6 @@
     <!-- Extensions -->
     <string name="extensions">Extensions</string>
     <string name="extension_updates">Extension Updates</string>
-    <string name="notify_extension_updates">Notify when extension updates are available</string>
     <string name="extension_info">Extension info</string>
     <string name="details">Details</string>
     <string name="obsolete">Obsolete</string>
@@ -266,7 +269,7 @@
     <string name="set_as_cover">Set as cover</string>
     <string name="set_as_default_for_all">Set as default for all</string>
     <string name="cover_updated">Cover updated</string>
-    <string name="page_">Page: %1$d</string>
+    <string name="page_">Page %1$d</string>
     <string name="next_chapter_not_found">Next chapter not found</string>
     <string name="decode_image_error">The image could not be decoded</string>
     <string name="use_image_as_cover">Use this image as cover art?</string>
@@ -289,6 +292,8 @@
     <string name="double_tap_anim_speed">Double tap animation speed</string>
     <string name="show_page_number">Show page number</string>
     <string name="true_32bit_color">32-bit color</string>
+    <string name="reduces_banding_impacts_performance">Reduces banding, but impacts
+        performance</string>
     <string name="crop_borders">Crop borders</string>
     <string name="use_custom_brightness">Use custom brightness</string>
     <string name="use_custom_color_filter">Use custom color filter</string>
@@ -300,6 +305,7 @@
     <string name="burn_darken">Burn / Darken</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="skip_read_chapters">Skip chapters marked read</string>
+    <string name="skip_filtered_chapters">Skip filtered chapters</string>
     <string name="navigation">Navigation</string>
     <string name="volume_keys">Volume keys</string>
     <string name="invert_volume_keys">Invert volume keys</string>
@@ -315,7 +321,7 @@
     <string name="right_to_left_viewer">Right to left</string>
     <string name="vertical_viewer">Vertical</string>
     <string name="continuous_vertical">Continuous vertical</string>
-    <string name="pager_viewer">Pager</string>
+    <string name="paged">Paged</string>
     <string name="scale_type">Scale type</string>
     <string name="fit_screen">Fit screen</string>
     <string name="stretch">Stretch</string>
@@ -333,6 +339,8 @@
     <string name="smart_based_on_page">Smart (based on page)</string>
     <string name="smart_based_on_page_and_theme">Smart (based on page and theme)</string>
     <string name="always_show_chapter_transition">Always show chapter transition</string>
+    <string name="if_disabled_transition_will_skip">If disabled, the transition page will be
+        skipped if the next chapter is loaded</string>
     <string name="pref_webtoon_side_padding">Side padding</string>
     <string name="webtoon_side_padding_0">None</string>
     <string name="webtoon_side_padding_10">10%</string>
@@ -379,11 +387,12 @@
     <string name="newest_first">Newest to oldest</string>
     <string name="oldest_first">Oldest to newest</string>
     <string name="clear_tags">Clear Tags</string>
-    <string name="edit_cover">Edit cover</string>
+    <string name="reset_tags">Reset Tags</string>
     <string name="reset_cover">Reset cover</string>
     <string name="failed_to_update_cover">Failed to update cover</string>
     <string name="must_be_in_library_to_edit">Manga must be in your library to edit</string>
     <string name="remember_this_choice">Remember this choice</string>
+    <string name="source_not_installed">Source not installed</string>
     <plurals name="deleted_chapters">
         <item quantity="one">A chapter has been removed from the source:\n%2$s\nDelete
             its download?</item>
@@ -414,17 +423,20 @@
     <string name="add_tracking">Add tracking</string>
 
     <!-- Migration -->
+    <string name="select_sources">Select sources</string>
     <string name="source_migration">Source migration</string>
     <string name="migration">Migration</string>
     <string name="skip_pre_migration">Skip pre-migration</string>
-    <string name="select_a_source_to_migrate_from">Select a source to migrate from</string>
+    <string name="select_a_source_then_item_to_migrate">Select a source, then select an item to
+        migrate</string>
     <string name="data_to_include_in_migration">Data to include in migration</string>
     <string name="search_parameter_eg">Search parameter (e.g. language:english)</string>
     <string name="include_extra_search_parameter">Include extra search parameter when searching</string>
     <string name="use_most_chapters">Use source with the most chapters (slower)</string>
     <string name="use_first_source">Use first source with alternative</string>
     <string name="skip_this_step_next_time">Skip this step next time</string>
-    <string name="to_show_again_setting_library">To show this screen again, go to Settings -> Library.</string>
+    <string name="to_show_again_setting_sources">To show this screen again, go to Settings ->
+        Sources.</string>
     <string name="latest_">Latest: %1$s</string>
     <string name="migrating_to">migrating to</string>
     <string name="dont_migrate">Don\'t migrate</string>
@@ -544,6 +556,22 @@
     <string name="clean_up_cached_covers">Clean up cached covers</string>
     <string name="delete_old_covers_in_library_used_">Delete old and unused cached covers of
         manga in your library that has been updated.\nCurrently using: %1$s</string>
+
+    <!-- Browse Settings -->
+    <string name="pref_global_search">Global search</string>
+    <string name="check_for_extension_updates">Check for extension updates</string>
+    <string name="only_search_pinned_when">Only search pinned sources</string>
+    <string name="match_pinned_sources">Match pinned sources</string>
+    <string name="match_enabled_sources">Match enabled sources</string>
+    <string name="only_enable_pinned_for_migration">Only enable your pinned sources for
+        migration</string>
+    <string name="only_enable_enabled_for_migration">Only enable your currently enabled sources for
+        migration</string>
+    <string name="use_last_saved_migration_preferences">Use last saved pre-migration preferences
+    and sources to mass migrate</string>
+    <string name="migration_sources_changed">Migration sources changed</string>
+    <string name="you_can_migrate_in_library">You can also migrate by selecting manga in your
+        library</string>
 
     <!-- About section -->
     <string name="version">Version</string>
@@ -710,6 +738,7 @@
     <string name="save">Save</string>
     <string name="search">Search</string>
     <string name="select_all">Select all</string>
+    <string name="select_none">Select none</string>
     <string name="share">Share</string>
     <string name="sort">Sort</string>
     <string name="sort_and_filter">Sort &amp; Filter</string>

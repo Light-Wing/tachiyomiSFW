@@ -154,21 +154,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:requiresFadingEdge="horizontal"
+        android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@id/manga_summary_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bottom_line"
-        android:requiresFadingEdge="horizontal"
-        android:scrollbars="none">
+        app:layout_constraintTop_toBottomOf="@id/bottom_line">
 
         <LinearLayout
             android:id="@+id/button_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
+            android:orientation="horizontal"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:orientation="horizontal">
+            android:paddingEnd="16dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/favorite_button"
@@ -181,7 +181,7 @@
                 style="@style/Theme.Widget.Button.RoundedOutline"
                 android:layout_marginStart="6dp"
                 android:text="@string/tracking"
-                app:icon="@drawable/ic_sync_black_24dp" />
+                app:icon="@drawable/ic_sync_24dp" />
 
             <ImageView
                 android:id="@+id/webview_button"
@@ -193,7 +193,7 @@
                 android:layout_marginEnd="6dp"
                 android:contentDescription="@string/open_in_webview"
                 android:padding="5dp"
-                android:src="@drawable/ic_open_in_webview_white_24dp"
+                android:src="@drawable/ic_open_in_webview_24dp"
                 android:tooltipText="@string/open_in_webview" />
 
             <ImageView
@@ -206,7 +206,7 @@
                 android:layout_marginEnd="6dp"
                 android:contentDescription="@string/share"
                 android:padding="5dp"
-                android:src="@drawable/ic_share_white_24dp"
+                android:src="@drawable/ic_share_24dp"
                 android:tooltipText="@string/share" />
         </LinearLayout>
     </HorizontalScrollView>
@@ -381,7 +381,7 @@
             android:layout_marginEnd="12dp"
             android:background="@null"
             android:padding="5dp"
-            android:src="@drawable/ic_filter_list_white_24dp"
+            android:src="@drawable/ic_filter_list_24dp"
             android:tint="?colorAccent"
             app:layout_constraintBottom_toBottomOf="@id/chapters_title"
             app:layout_constraintEnd_toEndOf="parent"

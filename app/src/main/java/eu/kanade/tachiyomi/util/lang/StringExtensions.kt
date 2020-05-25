@@ -22,6 +22,14 @@ fun String.removeArticles(): String {
     }
 }
 
+val String.sqLite: String
+    get() = replace("'", "''")
+
+fun String.trimOrNull(): String? {
+    val trimmed = trim()
+    return if (trimmed.isBlank()) null else trimmed
+}
+
 /**
  * Replaces the given string to have at most [count] characters using [replacement] near the center.
  * If [replacement] is longer than [count] an exception will be thrown when `length > count`.
@@ -33,6 +41,11 @@ fun String.truncateCenter(count: Int, replacement: String = "..."): String {
     val pieceLength: Int = floor((count - replacement.length).div(2.0)).toInt()
 
     return "${take(pieceLength)}$replacement${takeLast(pieceLength)}"
+}
+
+fun String.capitalizeWords(): String {
+    val firstReplace = split(" ").joinToString(" ") { it.capitalize() }
+    return firstReplace.split("-").joinToString("-") { it.capitalize() }
 }
 
 /**

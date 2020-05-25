@@ -23,6 +23,7 @@ import android.view.animation.AnimationUtils
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.graphics.ColorUtils
+import com.afollestad.materialdialogs.MaterialDialog
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -33,6 +34,8 @@ import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
 import eu.kanade.tachiyomi.data.notification.Notifications
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.ui.base.MaterialMenuSheet
 import eu.kanade.tachiyomi.ui.base.activity.BaseRxActivity
 import eu.kanade.tachiyomi.ui.reader.ReaderPresenter.SetAsCoverResult.AddToLibraryFirst
 import eu.kanade.tachiyomi.ui.reader.ReaderPresenter.SetAsCoverResult.Error
@@ -45,6 +48,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.pager.L2RPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.VerticalPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
+import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.system.GLUtil
 import eu.kanade.tachiyomi.util.system.ThemeUtil
@@ -385,7 +389,7 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
         if (visible) {
             snackbar?.dismiss()
             systemUi?.show()
-            appbar.visible()
+            reader_menu.visible()
 
             if (chapters_bottom_sheet.sheetBehavior.isExpanded()) {
                 chapters_bottom_sheet.sheetBehavior?.isHideable = false
@@ -412,14 +416,14 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
                 val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
                 toolbarAnimation.setAnimationListener(object : SimpleAnimationListener() {
                     override fun onAnimationEnd(animation: Animation) {
-                        appbar.gone()
+                        reader_menu.gone()
                     }
                 })
                 appbar.startAnimation(toolbarAnimation)
                 BottomSheetBehavior.from(chapters_bottom_sheet).isHideable = true
                 chapters_bottom_sheet.sheetBehavior?.hide()
             } else {
-                appbar.gone()
+                reader_menu.gone()
             }
         }
         menuStickyVisible = false
@@ -437,7 +441,7 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
             RIGHT_TO_LEFT -> R2LPagerViewer(this)
             VERTICAL -> VerticalPagerViewer(this)
             WEBTOON -> WebtoonViewer(this)
-            VERTICAL_PLUS -> WebtoonViewer(this, isContinuous = false)
+            VERTICAL_PLUS -> WebtoonViewer(this, hasMargins = true)
             else -> L2RPagerViewer(this)
         }
 
@@ -568,7 +572,25 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
      * actions to perform is shown.
      */
     fun onPageLongTap(page: ReaderPage) {
-        ReaderPageSheet(this, page).show()
+        val items = listOf(
+            MaterialMenuSheet.MenuSheetItem(
+                0, R.drawable.ic_photo_24dp, R.string.set_as_cover
+            ),
+            MaterialMenuSheet.MenuSheetItem(
+                1, R.drawable.ic_share_24dp, R.string.share
+            ),
+            MaterialMenuSheet.MenuSheetItem(
+                2, R.drawable.ic_save_24dp, R.string.save
+            )
+        )
+        MaterialMenuSheet(this, items) { _, item ->
+            when (item) {
+                0 -> showSetCoverPrompt(page)
+                1 -> shareImage(page)
+                2 -> saveImage(page)
+            }
+            true
+        }.show()
         if (chapters_bottom_sheet.sheetBehavior.isExpanded()) {
             chapters_bottom_sheet.sheetBehavior?.collapse()
         }
@@ -607,13 +629,31 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
         presenter.shareImage(page)
     }
 
+    fun showSetCoverPrompt(page: ReaderPage) {
+        if (page.status != Page.READY) return
+
+        MaterialDialog(this)
+            .title(R.string.use_image_as_cover)
+            .positiveButton(android.R.string.yes) {
+                setAsCover(page)
+            }
+            .negativeButton(android.R.string.no)
+            .show()
+    }
+
     /**
      * Called from the presenter when a page is ready to be shared. It shows Android's default
      * sharing tool.
      */
-    fun onShareImageResult(file: File) {
+    fun onShareImageResult(file: File, page: ReaderPage) {
+        val manga = presenter.manga ?: return
+        val chapter = page.chapter.chapter
+
+        val text = "${manga.title}: ${chapter.name}, ${getString(R.string.page_, page.number)}"
+
         val stream = file.getUriCompat(this)
         val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, text)
             putExtra(Intent.EXTRA_STREAM, stream)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             clipData = ClipData.newRawUri(null, stream)
@@ -679,7 +719,7 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
                     }
                 }
                 if (sheetManageNavColor) window.navigationBarColor = getResourceColor(R.attr.colorSecondary)
-                appbar.visible()
+                reader_menu.visible()
                 val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
                 toolbarAnimation.setAnimationListener(object : SimpleAnimationListener() {
                     override fun onAnimationStart(animation: Animation) {
@@ -710,6 +750,20 @@ class ReaderActivity : BaseRxActivity<ReaderPresenter>(),
                     WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
             }
         }
+    }
+
+    fun openMangaInBrowser() {
+        val source = presenter.getSource() ?: return
+        val url = try {
+            source.mangaDetailsRequest(presenter.manga!!).url.toString()
+        } catch (e: Exception) {
+            return
+        }
+
+        val intent = WebViewActivity.newIntent(
+            applicationContext, source.id, url, presenter.manga!!.title
+        )
+        startActivity(intent)
     }
 
     /**

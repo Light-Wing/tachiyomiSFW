@@ -55,14 +55,46 @@ fun Controller.setOnQueryTextChangeListener(
     })
 }
 
+fun Controller.liftAppbarWith(recycler: RecyclerView) {
+    view?.applyWindowInsetsForController()
+    recycler.setOnApplyWindowInsetsListener(RecyclerWindowInsetsListener)
+
+    var elevationAnim: ValueAnimator? = null
+    var elevate = false
+    val elevateFunc: (Boolean) -> Unit = { el ->
+        elevate = el
+        elevationAnim?.cancel()
+        elevationAnim = ValueAnimator.ofFloat(
+            activity?.appbar?.elevation ?: 0f, if (el) 15f else 0f
+        )
+        elevationAnim?.addUpdateListener { valueAnimator ->
+            activity?.appbar?.elevation = valueAnimator.animatedValue as Float
+        }
+        elevationAnim?.start()
+    }
+    elevateFunc(recycler.canScrollVertically(-1))
+    recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            if (router?.backstack?.lastOrNull()
+                    ?.controller() == this@liftAppbarWith && activity != null
+            ) {
+                val notAtTop = recycler.canScrollVertically(-1)
+                if (notAtTop != elevate) elevateFunc(notAtTop)
+            }
+        }
+    })
+}
+
 fun Controller.scrollViewWith(
     recycler: RecyclerView,
     padBottom: Boolean = false,
     customPadding: Boolean = false,
     swipeRefreshLayout: SwipeRefreshLayout? = null,
     afterInsets: ((WindowInsets) -> Unit)? = null,
-    liftOnScroll: ((Boolean) -> Unit)? = null
-) {
+    liftOnScroll: ((Boolean) -> Unit)? = null,
+    onLeavingController: (() -> Unit)? = null
+): ((Boolean) -> Unit) {
     var statusBarHeight = -1
     activity?.appbar?.y = 0f
     val attrsArray = intArrayOf(R.attr.actionBarSize)
@@ -98,7 +130,7 @@ fun Controller.scrollViewWith(
         elevate = el
         if (liftOnScroll != null) {
             liftOnScroll.invoke(el)
-        } else if (recycler.translationY == 0f) {
+        } else {
             elevationAnim?.cancel()
             elevationAnim = ValueAnimator.ofFloat(
                 activity?.appbar?.elevation ?: 0f, if (el) 15f else 0f
@@ -119,7 +151,7 @@ fun Controller.scrollViewWith(
             if (changeType.isEnter) {
                 elevateFunc(elevate)
                 if (fakeToolbarView?.parent != null) {
-                    val parent = recycler.parent as? ViewGroup ?: return
+                    val parent = fakeToolbarView?.parent as? ViewGroup ?: return
                     parent.removeView(fakeToolbarView)
                     fakeToolbarView = null
                 }
@@ -145,6 +177,7 @@ fun Controller.scrollViewWith(
                     params?.width = MATCH_PARENT
                     v.setBackgroundColor(v.context.getResourceColor(R.attr.colorSecondary))
                     v.layoutParams = params
+                    onLeavingController?.invoke()
                 }
                 elevationAnim?.cancel()
                 if (activity!!.toolbar.tag == randomTag) activity!!.toolbar.setOnClickListener(null)
@@ -173,8 +206,8 @@ fun Controller.scrollViewWith(
                     activity!!.appbar.y = MathUtils.clamp(
                         activity!!.appbar.y, -activity!!.appbar.height.toFloat(), 0f
                     )
-                    if ((activity!!.appbar.y <= -activity!!.appbar.height.toFloat() ||
-                            dy == 0 && activity!!.appbar.y == 0f) && !elevate)
+                    if (((activity!!.appbar.y <= -activity!!.appbar.height.toFloat() ||
+                            dy == 0 && activity!!.appbar.y == 0f) || dy == 0) && !elevate)
                         elevateFunc(true)
                     lastY = activity!!.appbar.y
                 }
@@ -203,6 +236,7 @@ fun Controller.scrollViewWith(
             }
         }
     })
+    return elevateFunc
 }
 
 fun Controller.requestPermissionsSafe(permissions: Array<String>, requestCode: Int) {

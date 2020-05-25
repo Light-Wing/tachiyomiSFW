@@ -25,6 +25,7 @@ import eu.kanade.tachiyomi.ui.library.filter.FilterBottomSheet
 import eu.kanade.tachiyomi.ui.library.filter.FilterBottomSheet.Companion.STATE_EXCLUDE
 import eu.kanade.tachiyomi.ui.library.filter.FilterBottomSheet.Companion.STATE_IGNORE
 import eu.kanade.tachiyomi.ui.library.filter.FilterBottomSheet.Companion.STATE_INCLUDE
+import eu.kanade.tachiyomi.util.lang.capitalizeWords
 import eu.kanade.tachiyomi.util.lang.removeArticles
 import eu.kanade.tachiyomi.util.system.executeOnIO
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +37,7 @@ import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.util.ArrayList
 import java.util.Comparator
+import java.util.Locale
 
 /**
  * Presenter of [LibraryController].
@@ -136,10 +138,9 @@ class LibraryPresenter(
 
     fun restoreLibrary() {
         val items = libraryItems
-        val show = showAllCategories || !libraryIsGrouped ||
-            categories.size == 1
+        val show = showAllCategories || !libraryIsGrouped || categories.size == 1
         if (!show) {
-            sectionedLibraryItems = items.groupBy { it.manga.category }.toMutableMap()
+            sectionedLibraryItems = items.groupBy { it.header.category.id!! }.toMutableMap()
             if (currentCategory == -1) currentCategory = categories.find {
                 it.order == preferences.lastUsedCategory().getOrDefault()
             }?.id ?: 0
@@ -149,6 +150,11 @@ class LibraryPresenter(
                 ?: sectionedLibraryItems[categories.first().id] ?: blankItem()
             else libraryItems, true
         )
+    }
+
+    fun getMangaInCategories(catId: Int?): List<LibraryManga>? {
+        catId ?: return null
+        return allLibraryItems.filter { it.header.category.id == catId }.map { it.manga }
     }
 
     private suspend fun sectionLibrary(items: List<LibraryItem>, freshStart: Boolean = false) {
@@ -242,8 +248,11 @@ class LibraryPresenter(
         if (filterUnread == 4 && !(item.manga.unread > 0 && item.manga.hasRead)) return false
 
         if (filterMangaType > 0) {
-            if (if (filterMangaType == Manga.TYPE_MANHWA) (filterMangaType != item.manga.mangaType() && filterMangaType != Manga.TYPE_WEBTOON)
-                else filterMangaType != item.manga.mangaType()
+            if (if (filterMangaType == Manga.TYPE_MANHWA) {
+                    (filterMangaType != item.manga.mangaType() && filterMangaType != Manga.TYPE_WEBTOON)
+                } else {
+                    filterMangaType != item.manga.mangaType()
+                }
             ) return false
         }
 
@@ -435,7 +444,7 @@ class LibraryPresenter(
         val categories = db.getCategories().executeAsBlocking().toMutableList()
         var libraryManga = db.getLibraryMangas().executeAsBlocking()
         val showAll = showAllCategories
-        if (groupType <= BY_DEFAULT || !libraryIsGrouped) {
+        if (groupType > BY_DEFAULT) {
             libraryManga = libraryManga.distinctBy { it.id }
         }
 
@@ -507,7 +516,7 @@ class LibraryPresenter(
 
         this.allCategories = categories
 
-        hashCategories = HashMap(this.categories.mapNotNull {
+        hashCategories = HashMap(this.categories.map {
             it.id!! to it
         }.toMap())
 
@@ -529,14 +538,14 @@ class LibraryPresenter(
             }
         }
 
-        val items = libraryManga.mapNotNull { manga ->
+        val items = libraryManga.map { manga ->
             when (groupType) {
                 BY_TAG -> {
                     val tags = if (manga.genre.isNullOrBlank()) {
                         listOf("Unknown")
                     } else {
                         manga.genre?.split(",")?.mapNotNull {
-                            val tag = it.trim()
+                            val tag = it.trim().capitalizeWords()
                             if (tag.isBlank()) null else tag
                         } ?: listOf("Unknown")
                     }
@@ -831,7 +840,7 @@ class LibraryPresenter(
     }
 
     fun toggleCategoryVisibility(categoryId: Int) {
-        if (categoryId <= -1 || categories.find { it.id == categoryId }?.isDynamic == true) return
+        if (categories.find { it.id == categoryId }?.isDynamic == true) return
         val categoriesHidden = preferences.collapsedCategories().getOrDefault().mapNotNull {
             it.toIntOrNull()
         }.toMutableSet()
@@ -845,7 +854,7 @@ class LibraryPresenter(
 
     fun toggleAllCategoryVisibility() {
         if (preferences.collapsedCategories().getOrDefault().isEmpty()) {
-            preferences.collapsedCategories().set(categories.map { it.id.toString() }.toMutableSet())
+            preferences.collapsedCategories().set(allCategories.map { it.id.toString() }.toMutableSet())
         } else {
             preferences.collapsedCategories().set(mutableSetOf())
         }
@@ -868,6 +877,25 @@ class LibraryPresenter(
                         db.insertManga(manga).executeAsBlocking()
                     }
                     db.resetMangaInfo(manga).executeAsBlocking()
+                }
+            }
+        }
+
+        fun updateCustoms() {
+            val db: DatabaseHelper = Injekt.get()
+            val cc: CoverCache = Injekt.get()
+            db.inTransaction {
+                val libraryManga = db.getLibraryMangas().executeAsBlocking()
+                libraryManga.forEach { manga ->
+                    if (manga.thumbnail_url?.startsWith("custom", ignoreCase = true) == true) {
+                        val file = cc.getCoverFile(manga)
+                        if (file.exists()) {
+                            file.renameTo(cc.getCustomCoverFile(manga))
+                        }
+                        manga.thumbnail_url =
+                            manga.thumbnail_url!!.toLowerCase(Locale.ROOT).substringAfter("custom-")
+                        db.insertManga(manga).executeAsBlocking()
+                    }
                 }
             }
         }

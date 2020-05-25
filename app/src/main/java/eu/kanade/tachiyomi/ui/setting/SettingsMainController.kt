@@ -7,7 +7,6 @@ import androidx.preference.PreferenceScreen
 import com.bluelinelabs.conductor.Controller
 import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.ui.migration.MigrationController
 import eu.kanade.tachiyomi.util.system.getResourceColor
 import eu.kanade.tachiyomi.util.system.openInBrowser
 import eu.kanade.tachiyomi.util.view.withFadeTransaction
@@ -24,13 +23,13 @@ class SettingsMainController : SettingsController() {
         val tintColor = context.getResourceColor(R.attr.colorAccent)
 
         preference {
-            iconRes = R.drawable.ic_tune_white_24dp
+            iconRes = R.drawable.ic_tune_24dp
             iconTint = tintColor
             titleRes = R.string.general
             onClick { navigateTo(SettingsGeneralController()) }
         }
         preference {
-            iconRes = R.drawable.ic_book_black_24dp
+            iconRes = R.drawable.ic_book_24dp
             iconTint = tintColor
             titleRes = R.string.library
             onClick { navigateTo(SettingsLibraryController()) }
@@ -42,37 +41,37 @@ class SettingsMainController : SettingsController() {
             onClick { navigateTo(SettingsReaderController()) }
         }
         preference {
-            iconRes = R.drawable.ic_file_download_black_24dp
+            iconRes = R.drawable.ic_file_download_24dp
             iconTint = tintColor
             titleRes = R.string.downloads
             onClick { navigateTo(SettingsDownloadController()) }
         }
         preference {
-            iconRes = R.drawable.ic_swap_calls_white_24dp
+            iconRes = R.drawable.ic_browse_24dp
             iconTint = tintColor
-            titleRes = R.string.source_migration
-            onClick { navigateTo(MigrationController()) }
+            titleRes = R.string.sources
+            onClick { navigateTo(SettingsBrowseController()) }
         }
         preference {
-            iconRes = R.drawable.ic_sync_black_24dp
+            iconRes = R.drawable.ic_sync_24dp
             iconTint = tintColor
             titleRes = R.string.tracking
             onClick { navigateTo(SettingsTrackingController()) }
         }
         preference {
-            iconRes = R.drawable.ic_backup_black_24dp
+            iconRes = R.drawable.ic_backup_24dp
             iconTint = tintColor
             titleRes = R.string.backup
             onClick { navigateTo(SettingsBackupController()) }
         }
         preference {
-            iconRes = R.drawable.ic_code_black_24dp
+            iconRes = R.drawable.ic_code_24dp
             iconTint = tintColor
             titleRes = R.string.advanced
             onClick { navigateTo(SettingsAdvancedController()) }
         }
         preference {
-            iconRes = R.drawable.ic_info_black_24dp
+            iconRes = R.drawable.ic_info_24dp
             iconTint = tintColor
             titleRes = R.string.about
             onClick { navigateTo(AboutController()) }

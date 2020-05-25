@@ -6,7 +6,6 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Category
 import eu.kanade.tachiyomi.data.library.LibraryUpdateJob
-import eu.kanade.tachiyomi.data.preference.getOrDefault
 import eu.kanade.tachiyomi.ui.category.CategoryController
 import eu.kanade.tachiyomi.util.view.withFadeTransaction
 import uy.kohesive.injekt.Injekt
@@ -20,7 +19,7 @@ class SettingsLibraryController : SettingsController() {
     override fun setupPreferenceScreen(screen: PreferenceScreen) = with(screen) {
         titleRes = R.string.library
         preferenceCategory {
-            titleRes = R.string.display
+            titleRes = R.string.general
             switchPreference {
                 key = Keys.removeArticles
                 titleRes = R.string.sort_by_ignoring_articles
@@ -160,18 +159,11 @@ class SettingsLibraryController : SettingsController() {
                 summaryRes = R.string.auto_refresh_covers_summary
                 defaultValue = true
             }
-        }
-        if (preferences.skipPreMigration().getOrDefault() || preferences.migrationSources().getOrDefault().isNotEmpty()) {
-            preferenceCategory {
-                titleRes = R.string.migration
-                // Only show this if someone has mass migrated manga once
 
-                switchPreference {
-                    key = Keys.skipPreMigration
-                    titleRes = R.string.skip_pre_migration
-                    summaryRes = R.string.use_last_saved_migration_preferences
-                    defaultValue = false
-                }
+            switchPreference {
+                key = Keys.showLibraryUpdateErrors
+                titleRes = R.string.show_notification_error
+                defaultValue = false
             }
         }
     }

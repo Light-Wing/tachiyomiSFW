@@ -9,7 +9,6 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.util.Locale
-import kotlin.random.Random
 
 interface Manga : SManga {
 
@@ -71,7 +70,7 @@ interface Manga : SManga {
     fun mangaType(): Int {
         val sourceName = Injekt.get<SourceManager>().getOrStub(source).name
         val currentTags =
-            genre?.split(",")?.map { it.trim().toLowerCase(Locale.US) } ?: return TYPE_MANGA
+            genre?.split(",")?.map { it.trim().toLowerCase(Locale.US) } ?: emptyList()
         return if (currentTags.any { tag -> tag.startsWith("japanese") || isMangaTag(tag) }) {
             TYPE_MANGA
         } else if (currentTags.any { tag -> tag.startsWith("english") || isComicTag(tag) } || isComicSource(
@@ -108,7 +107,7 @@ interface Manga : SManga {
             { tag ->
                 tag == "chinese" || tag == "manhua" ||
                     tag.startsWith("english") || tag == "comic"
-            } == true || (isComicSource(sourceName) && !sourceName.contains("tapastic", true)) ||
+            } == true || (isComicSource(sourceName) && !sourceName.contains("tapas", true)) ||
             sourceName.contains("manhua", true)
         )
             ReaderActivity.LEFT_TO_RIGHT
@@ -142,20 +141,12 @@ interface Manga : SManga {
             sourceName.contains("dilbert", true) ||
             sourceName.contains("cyanide", true) ||
             sourceName.contains("xkcd", true) ||
-            sourceName.contains("tapastic", true)
+            sourceName.contains("tapas", true) ||
+            sourceName.contains("ComicExtra", true)
     }
 
     fun key(): String {
         return DiskUtil.hashKeyForDisk(thumbnail_url.orEmpty())
-    }
-
-    fun setCustomThumbnailUrl() {
-        removeCustomThumbnailUrl()
-        thumbnail_url = "Custom-${Random.nextInt(0, 1000)}-J2K-${thumbnail_url ?: id!!}"
-    }
-
-    fun removeCustomThumbnailUrl() {
-        thumbnail_url = thumbnail_url?.substringAfter("-J2K-")?.substringAfter("Custom-")
     }
 
     // Used to display the chapter's title one way or another
@@ -212,11 +203,11 @@ interface Manga : SManga {
         const val DISPLAY_NUMBER = 0x00100000
         const val DISPLAY_MASK = 0x00100000
 
-        const val TYPE_MANGA = 0
-        const val TYPE_MANHWA = 1
-        const val TYPE_MANHUA = 2
-        const val TYPE_COMIC = 3
-        const val TYPE_WEBTOON = 4
+        const val TYPE_MANGA = 1
+        const val TYPE_MANHWA = 2
+        const val TYPE_MANHUA = 3
+        const val TYPE_COMIC = 4
+        const val TYPE_WEBTOON = 5
 
         fun create(source: Long): Manga = MangaImpl().apply {
             this.source = source

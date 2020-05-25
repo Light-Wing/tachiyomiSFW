@@ -22,33 +22,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/category_layout"
+            <eu.kanade.tachiyomi.ui.library.category.CategoryRecyclerView
+                android:id="@+id/category_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="?actionBarSize"
-                android:orientation="vertical">
+                android:clipToPadding="false"
+                android:paddingBottom="4dp"
+                android:scrollbars="vertical" />
 
-                <eu.kanade.tachiyomi.ui.library.category.CategoryRecyclerView
-                    android:id="@+id/category_recycler"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="4dp"
-                    android:scrollbars="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:alpha="0.1"
-                    android:background="@drawable/shape_gradient_top_shadow"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:id="@+id/recycler_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:alpha="0.25"
+                android:background="@drawable/shape_gradient_top_shadow"
+                android:translationY="12dp"
+                app:layout_constraintBottom_toTopOf="@id/recycler"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <include layout="@layout/library_grid_recycler" />
 
@@ -57,16 +49,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alpha="0"
-                android:background="?android:colorBackground" />
+                android:background="@drawable/bottom_sheet_rounded_background"
+                android:backgroundTint="?android:textColorPrimaryInverse" />
         </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <eu.kanade.tachiyomi.ui.library.MaterialFastScroll
+    <eu.kanade.tachiyomi.ui.base.MaterialFastScroll
         android:id="@+id/fast_scroller"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:fastScrollerBubbleEnabled="true" />
+
+    <TextView
+        android:id="@+id/header_title"
+        style="@style/TextAppearance.MaterialComponents.Headline6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/list_item_selector"
+        android:backgroundTint="?colorSecondary"
+        android:clickable="true"
+        android:elevation="5dp"
+        android:ellipsize="end"
+        android:focusable="true"
+        android:gravity="center"
+        android:inputType="none"
+        android:maxLines="1"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="6dp"
+        android:textColor="?actionBarTintColor"
+        android:textSize="14sp"
+        tools:text="Category" />
 
     <eu.kanade.tachiyomi.widget.EmptyView
         android:id="@+id/empty_view"
@@ -86,16 +101,16 @@
         app:layout_anchorGravity="top" />
 
     <com.google.android.material.textview.MaterialTextView
-        style="@style/FloatingTextView"
         android:id="@+id/jumper_category_text"
+        style="@style/FloatingTextView"
         android:layout_gravity="start|center"
         android:layout_marginBottom="8dp"
         android:alpha="0.0"
         android:gravity="center"
         app:layout_anchor="@id/category_hopper_frame"
         app:layout_anchorGravity="start|center"
-        tools:text="Category and a long one"
-        tools:alpha="1" />
+        tools:alpha="1"
+        tools:text="Category and a long one" />
 
     <FrameLayout
         android:id="@+id/category_hopper_frame"

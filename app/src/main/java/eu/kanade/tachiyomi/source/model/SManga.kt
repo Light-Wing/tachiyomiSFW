@@ -27,20 +27,29 @@ interface SManga : Serializable {
 
     var isSFW: Int?
 
-    fun hasCustomCover() = thumbnail_url?.startsWith("Custom-") == true
+    val originalTitle: String
+        get() = (this as? MangaImpl)?.ogTitle ?: title
+    val originalAuthor: String?
+        get() = (this as? MangaImpl)?.ogAuthor ?: author
+    val originalArtist: String?
+        get() = (this as? MangaImpl)?.ogArtist ?: artist
+    val originalDescription: String?
+        get() = (this as? MangaImpl)?.ogDesc ?: description
+    val originalGenre: String?
+        get() = (this as? MangaImpl)?.ogGenre ?: genre
 
     fun copyFrom(other: SManga) {
         if (other.author != null)
-            author = other.author
+            author = other.originalAuthor
 
         if (other.artist != null)
-            artist = other.artist
+            artist = other.originalArtist
 
         if (other.description != null)
-            description = other.description
+            description = other.originalDescription
 
         if (other.genre != null)
-            genre = other.genre
+            genre = other.originalGenre
 
         // TODO remove the Timber(s)
         Timber.i("Genres in SManga copyFrom")
@@ -51,7 +60,7 @@ interface SManga : Serializable {
             url = "$url/nsfw" // doing this so I can filter any link with the "nsfw" keyword at the end...
             isSFW = 1
             thumbnail_url = "https://fakeimg.pl/225x340/282828/eae0d0/?text=copyFrom%0AReplaced%0Ain-SManga" // ${other.title.replace(" ", "%0A")}"
-        } else if (other.thumbnail_url != null && !hasCustomCover())
+        } else if (other.thumbnail_url != null)
             thumbnail_url = other.thumbnail_url
 
         status = other.status
