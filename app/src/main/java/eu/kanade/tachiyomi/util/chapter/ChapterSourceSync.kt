@@ -26,23 +26,36 @@ fun syncChaptersWithSource(
     source: Source
 ): Pair<List<Chapter>, List<Chapter>> {
 
+    // mark - added
+//    if (manga.isSFW == 1 || checkAdult(manga.genre.toString())) {
+// //        Timber.e("No chapters found (nsfw)")
+//        throw Exception("No chapters found")
+//    }
+//    Timber.e("rawSourceChapters")
+//    Timber.e(rawSourceChapters.toString())
     if (rawSourceChapters.isEmpty()) {
         throw Exception("No chapters found")
-    }
-
-    // mark - added
-    if (manga.isSFW == 1 || checkAdult(manga.genre.toString())) {
-        throw Exception("No chapters found (nsfw)")
     }
 
     // Chapters from db.
     val dbChapters = db.getChapters(manga).executeAsBlocking()
 
-    val sourceChapters = rawSourceChapters.mapIndexed { i, sChapter ->
-        Chapter.create().apply {
-            copyFrom(sChapter)
-            manga_id = manga.id
-            source_order = i
+    val sourceChapters = if (manga.isSFW == 1 || checkAdult(manga.genre.toString())) {
+        listOf<Chapter>()
+    } else {
+        rawSourceChapters.mapIndexed { i, sChapter ->
+            Chapter.create().apply {
+//            if (manga.isSFW == 1 || checkAdult(manga.genre.toString())) {
+//                    name = "blocked"
+//                    url = sChapter.url + "nsfw"
+//                    date_upload = 0
+//                    chapter_number = 0F
+//            } else {
+                copyFrom(sChapter)
+//            }
+                manga_id = manga.id
+                source_order = i
+            }
         }
     }
 

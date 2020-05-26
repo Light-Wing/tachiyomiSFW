@@ -62,7 +62,7 @@ open class MangaImpl : Manga {
     override var date_added: Long = 0
 
     override var isSFW: Int? = null // 1 - true, 0 - false
-    
+
     lateinit var ogTitle: String
         private set
     var ogAuthor: String? = null
