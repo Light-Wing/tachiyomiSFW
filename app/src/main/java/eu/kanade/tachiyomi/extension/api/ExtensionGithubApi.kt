@@ -85,6 +85,6 @@ internal class ExtensionGithubApi {
 
     companion object {
         private const val REPO_URL =
-            "https://raw.githubusercontent.com/light-wing/tachiyomi-extensions/repo"
+            "https://raw.githubusercontent.com/light-wing/tachiyomi-extensions/master/repo"
     }
 }

@@ -24,6 +24,6 @@ interface GithubService {
         }
     }
 
-    @GET("/repos/Jays2Kings/light-wing/releases/latest")
+    @GET("/repos/light-wing/releases/latest")
     suspend fun getLatestVersion(): GithubRelease
 }

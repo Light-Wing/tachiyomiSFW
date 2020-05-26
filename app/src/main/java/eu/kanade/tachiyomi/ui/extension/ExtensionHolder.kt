@@ -94,7 +94,7 @@ class ExtensionHolder(view: View, val adapter: ExtensionAdapter) :
                 }
             }
         } else if (extension is Extension.Untrusted) {
-            setText(R.string.trust)
+            setText(R.string.uninstall)
         } else {
             setText(R.string.install)
         }
