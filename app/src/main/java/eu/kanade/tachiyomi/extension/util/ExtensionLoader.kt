@@ -37,7 +37,7 @@ internal object ExtensionLoader {
             // inorichi's key
 //            "7ce04da7773d41b489f4693a366c36bcd0a11fc39b547168553c285bd7348e23"
     // light's key
-//    "430f8004b72a637603931fd2207500637386294046143ab5abccaf4ee60ad8a7"
+    "430f8004b72a637603931fd2207500637386294046143ab5abccaf4ee60ad8a7" +
     "bf594ae5c6e9cc64e0d832e920352a7f97730df10a247497e90ef0360ac8819f"
 
     /**
